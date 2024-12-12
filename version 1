@@ -1,0 +1,61 @@
+import java.util.Scanner;
+
+public class CreditCardValidator {
+    
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter a credit card number: ");
+        long cardNumber = scanner.nextLong();
+        
+        if (isValid(cardNumber)) {
+            System.out.println("The credit card number is valid.");
+        } else {
+            System.out.println("The credit card number is invalid.");
+        }
+        
+        scanner.close();
+    }
+    
+    public static boolean isValid(long cardNumber) {
+        // Convert to string to easily check length and prefix
+        String cardStr = Long.toString(cardNumber);
+        
+        // Check length
+        if (cardStr.length() < 13 || cardStr.length() > 16) {
+            return false;
+        }
+        
+        // Check prefix
+        char firstDigit = cardStr.charAt(0);
+        String firstTwoDigits = cardStr.length() > 1 ? cardStr.substring(0, 2) : "";
+        
+        if (!((firstDigit == '4') || 
+               (firstDigit == '5' && firstTwoDigits.charAt(0) == '5') || 
+               (firstTwoDigits.equals("37")) || 
+               (firstDigit == '6'))) {
+            return false;
+        }
+        
+        // Perform Luhn check
+        return luhnCheck(cardStr);
+    }
+
+    public static boolean luhnCheck(String cardStr) {
+        int sum = 0;
+        boolean alternate = false;
+        
+        for (int i = cardStr.length() - 1; i >= 0; i--) {
+            int n = Character.getNumericValue(cardStr.charAt(i));
+            
+            if (alternate) {
+                n *= 2;
+                if (n > 9) n -= 9; // Subtracting 9 is equivalent to adding digits of n
+            }
+            
+            sum += n;
+            alternate = !alternate; // Toggle alternate flag
+        }
+        
+        return (sum % 10 == 0); // Valid if sum modulo 10 is zero
+    }
+}
